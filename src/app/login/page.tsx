@@ -4,6 +4,7 @@ import { useState } from "react";
 import { GoogleOutlined } from "@ant-design/icons";
 import { notify } from "@/lib/toast";
 import { redirect } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 type LoginForm = {
   email: string;
@@ -28,12 +29,12 @@ export default function LoginPage() {
     setLoading(true);
     notify.success(`Đăng nhập thành công với email: ${form.email}`);
     setLoading(false);
-    redirect('/dashboard')
+    redirect("/dashboard");
   };
 
   const handleGoogleLogin = () => {
     notify.info("Đăng nhập bằng Google...");
-    // TODO: Supabase OAuth login
+    signIn("google", { callbackUrl: "/dashboard" });
   };
 
   return (
