@@ -1,17 +1,19 @@
-// src/store/authStore.ts
 import { create } from "zustand";
-import { devtools } from "zustand/middleware";
 
-interface AuthState {
-  user: { id: string; email: string } | null;
-  setUser: (user: AuthState["user"]) => void;
+type User = {
+  name: string;
+  email: string;
+  image?: string;
+};
+
+interface UserStore {
+  user: User | null;
+  setUser: (user: User) => void;
   clearUser: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  devtools((set) => ({
-    user: null,
-    setUser: (user) => set({ user }),
-    clearUser: () => set({ user: null }),
-  }))
-);
+export const useAuthStore = create<UserStore>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  clearUser: () => set({ user: null }),
+}));

@@ -1,31 +1,25 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Avatar, Button, Space } from "antd";
-import { LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { LogoutOutlined } from "@ant-design/icons";
 import { Header } from "antd/es/layout/layout";
-import { useSession } from "next-auth/react";
 import { useAuthStore } from "@/stores/authStore";
+import { signOut } from "next-auth/react";
 
 export default function DashboardHeader() {
-  const { data: session } = useSession();
-  const setUser = useAuthStore((s) => s.setUser);
+  const { user } = useAuthStore();
+  const handleSignOut = () => {
+    signOut({callbackUrl: '/login'});
+  };
 
-  useEffect(() => {
-    if (session?.user) {
-      setUser({
-        id: session.user.email || "default-id",
-        email: session.user.email || "unknown-email",
-      });
-    }
-  }, [session]);
   return (
     <Header className="bg-white px-6 flex justify-between items-center shadow">
       <Space>
-        <Avatar icon={<UserOutlined />} />
-        <span>Xin chào, Người dùng {session?.user?.name}</span>
+        <Avatar src={user?.image} />
+        <span>Xin chào, Người dùng {user?.name}</span>
       </Space>
-      <Button icon={<LogoutOutlined />} danger>
+      <Button icon={<LogoutOutlined />} onClick={handleSignOut} danger>
         Đăng xuất
       </Button>
     </Header>

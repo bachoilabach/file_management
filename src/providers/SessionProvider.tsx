@@ -8,11 +8,17 @@ interface Session extends NextAuthSession {
 }
 import { ReactNode } from "react";
 
-interface Props {
+interface SessionProviderProps {
   children: ReactNode;
   session: Session | null;
+  refetchInterval?: number;
 }
 
-export default function SessionProviderWrapper({ children, session }: Props) {
-  return <SessionProvider session={session}>{children}</SessionProvider>;
+export default function SessionProviderWrapper(props: SessionProviderProps) {
+  const { session, refetchInterval, children } = props;
+  return (
+    <SessionProvider session={session} refetchInterval={refetchInterval}>
+      {children}
+    </SessionProvider>
+  );
 }

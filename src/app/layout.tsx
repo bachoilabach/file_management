@@ -4,12 +4,10 @@ import "./globals.css";
 import "antd/dist/reset.css";
 import { Flip, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { SessionProvider } from "next-auth/react";
 import SessionProviderWrapper from "@/providers/SessionProvider";
-
-// import { SessionProvider } from "next-auth/react";
-// import { getServerSession } from "next-auth/next";
-// import authOptions from "@/lib/authOptions";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/pages/api/auth/[...nextauth]";
+import AuthSync from "@/components/AuthSync";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +29,15 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const session = await getServerSession(authOptions);
+  const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProviderWrapper session={null}>
+        <SessionProviderWrapper session={session} refetchInterval={60}>
+          <AuthSync />
           {children}
         </SessionProviderWrapper>
         <ToastContainer

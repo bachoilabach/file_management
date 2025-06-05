@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Table, Upload, message } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { Content } from "antd/es/layout/layout";
 import Title from "antd/es/typography/Title";
+import { useAuthStore } from "@/stores/authStore";
+import { useSession } from "next-auth/react";
 
 const files = [
   {
@@ -45,7 +47,6 @@ const columns = [
     key: "modified",
   },
 ];
-
 export default function Dashboard() {
   const handleUpload = () => {
     message.success("Tải lên thành công (giả lập)");
