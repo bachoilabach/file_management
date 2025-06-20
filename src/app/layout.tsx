@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import "antd/dist/reset.css";
-import { Flip, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import SessionProviderWrapper from "@/providers/SessionProvider";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/pages/api/auth/[...nextauth]";
-import AuthSync from "@/components/AuthSync";
+import "@ant-design/v5-patch-for-react-19";
+import ClientProviders from "@/providers/ClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,23 +34,9 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <SessionProviderWrapper session={session} refetchInterval={60}>
-          <AuthSync />
+        <ClientProviders session={session}>
           {children}
-        </SessionProviderWrapper>
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop
-          closeOnClick={false}
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-          transition={Flip}
-        />
+        </ClientProviders>
       </body>
     </html>
   );

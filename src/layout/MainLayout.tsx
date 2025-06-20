@@ -1,24 +1,20 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Layout } from "antd";
-import Sidebar from "@/components/Sidebar";
-import DashboardHeader from "@/components/Header";
+import { Layout, Button } from 'antd';
+import Sidebar from '@/components/Shared/UI/Sidebar';
+import DashboardHeader from '@/components/Shared/UI/Header';
 
 const { Content } = Layout;
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function MainLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Layout className="min-h-screen">
-      <Sidebar />
+    <Layout className='max-h-screen min-h-screen'>
+      <DashboardHeader />
       <Layout>
-        <DashboardHeader />
-        <Content className="p-6 bg-gray-50">{children}</Content>
+        <Sidebar />
+        <Content className='p-6 bg-white w-full overflow-auto'>{children}</Content>
       </Layout>
     </Layout>
   );
 }
+export default MainLayout;

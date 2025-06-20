@@ -1,9 +1,11 @@
-import { create } from "zustand";
+import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-type User = {
+export type User = {
   name: string;
   email: string;
-  image?: string;
+  image: string;
+  accessToken: string
 };
 
 interface UserStore {
@@ -12,8 +14,15 @@ interface UserStore {
   clearUser: () => void;
 }
 
-export const useAuthStore = create<UserStore>((set) => ({
-  user: null,
-  setUser: (user) => set({ user }),
-  clearUser: () => set({ user: null }),
-}));
+export const useAuthStore = create<UserStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      setUser: (user) => set({ user }),
+      clearUser: () => set({ user: null }),
+    }),
+    {
+      name: 'auth',
+    },
+  ),
+);

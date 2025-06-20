@@ -1,77 +1,91 @@
-"use client";
+'use client';
 
-import React, { useEffect } from "react";
-import { Button, Table, Upload, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
-import { Content } from "antd/es/layout/layout";
-import Title from "antd/es/typography/Title";
-import { useAuthStore } from "@/stores/authStore";
-import { useSession } from "next-auth/react";
+import React, { useEffect, useState } from 'react';
+import { Table } from 'antd';
+import { Content } from 'antd/es/layout/layout';
+import { ColumnsType } from 'antd/es/table';
+import { notify } from '@/lib/toast';
+import { getFiles } from '@/pages/api/file';
+import { useFileStore } from '@/stores/fileStore';
+import { IFile } from '@/interface/file';
 
-const files = [
-  {
-    key: "1",
-    name: "Document.pdf",
-    type: "PDF",
-    size: "1.2 MB",
-    modified: "2025-06-04",
-  },
-  {
-    key: "2",
-    name: "Image.png",
-    type: "Image",
-    size: "3.4 MB",
-    modified: "2025-06-01",
-  },
-];
+import { mapMimeTypeToFileType } from '@/utils/mimeTypes';
+import UploadFile from '@/components/Shared/UI/UploadFile';
+import DropDownCustom from '@/components/Shared/UI/DropDown';
 
-const columns = [
-  {
-    title: "Tên tệp",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Loại",
-    dataIndex: "type",
-    key: "type",
-  },
-  {
-    title: "Kích thước",
-    dataIndex: "size",
-    key: "size",
-  },
-  {
-    title: "Chỉnh sửa gần nhất",
-    dataIndex: "modified",
-    key: "modified",
-  },
-];
 export default function Dashboard() {
-  const handleUpload = () => {
-    message.success("Tải lên thành công (giả lập)");
+  const { files, setFiles } = useFileStore();
+  const [loading, setLoading] = useState(true);
+
+  const fetchFiles = async () => {
+    try {
+      setLoading(true);
+      const res = await getFiles();
+      const { files } = res;
+      setFiles(
+        files.map((file: IFile) => ({
+          ...file,
+          createdTime: new Date(file.createdTime),
+        })),
+      );
+    } catch (error) {
+      notify.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <Content className="p-6 bg-gray-50">
-      <div className="flex justify-between items-center mb-6">
-        <Title level={3} className="!mb-0">
-          Tệp của bạn
-        </Title>
-        <Upload showUploadList={false} customRequest={handleUpload}>
-          <Button icon={<UploadOutlined />} type="primary">
-            Tải lên
-          </Button>
-        </Upload>
-      </div>
+  useEffect(() => {
+    fetchFiles();
+  }, []);
 
-      <Table
-        columns={columns}
-        dataSource={files}
-        pagination={{ pageSize: 5 }}
-        bordered
-        className="bg-white rounded-xl shadow"
-      />
-    </Content>
+  const columns: ColumnsType<IFile> = [
+    {
+      title: 'Tên tệp',
+      dataIndex: 'name',
+      key: 'name',
+      align: 'match-parent',
+      width: '60%',
+    },
+    {
+      title: 'Loại',
+      dataIndex: 'mimeType',
+      key: 'mimeType',
+      align: 'center',
+      render: (text) => mapMimeTypeToFileType(text),
+    },
+    {
+      title: 'Ngày tạo',
+      dataIndex: 'createdTime',
+      key: 'createdTime',
+      align: 'center',
+
+      render: (text) => new Date(text).toLocaleDateString('vi-VN'),
+    },
+    {
+      title: '',
+      key: 'actions',
+      align: 'center',
+      render: (_text, record) => <DropDownCustom fileId={record.id} fileName={record.name} />,
+    },
+  ];
+
+  return (
+    <>
+      <Content className='p-6 max-h-screen'>
+        <div className='flex justify-end items-center mb-6'>
+          <UploadFile />
+        </div>
+        <Table
+          columns={columns}
+          dataSource={files}
+          loading={loading}
+          pagination={{ pageSize: 7, showSizeChanger: false, className: 'pr-4' }}
+          rowKey='id'
+          bordered
+          className='bg-white rounded-xl shadow'
+        />
+      </Content>
+    </>
   );
 }
